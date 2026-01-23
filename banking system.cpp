@@ -1,98 +1,130 @@
-#include <bits/stdc++.h>
+#include<bits/stdc++.h>
 using namespace std;
 class Account
 {
 private:
-    int balance;
-
+    int balance, pin, weeklyWithdrawn;
+    static const int minBal = 500;
+    static const int weeklyLimit = 10000;
 public:
-    // constructor
-    Account(int b)
+    // Constructor
+    Account(int b, int p)
     {
-        if (b >= 0)
-        {
-            balance = b;
-        }
+        if(b >= minBal)
+            balance=b;
         else
-        {
-            balance = 0;
-        }
+            balance=minBal;
+        pin = p;
+        weeklyWithdrawn = 0;
     }
 
-    // deposit money
+    // PIN verification
+    bool pinVerify(int enteredPin)
+    {
+        return enteredPin == pin;
+    }
+
+    // Deposit
     void deposit(int amount)
     {
-        if (amount > 0)
+        if(amount > 0)
         {
             balance += amount;
-            cout << "Deposited successfully!!" << endl;
+            cout<<"Deposited successfully!!"<<endl;
         }
         else
         {
-            cout << "Invalid deposit amount. Please try again" << endl;
+            cout<<"Invalid deposit amount! TRY AGAIN..."<<endl;
         }
     }
 
-    // withdraw money
-    void withdraw(int amount)
+    // Withdraw
+    void withdraw(int amount, int enteredPin)
     {
-        if (amount > 0 && amount <= balance)
+        if(!pinVerify(enteredPin))
         {
-            balance -= amount;
-            cout << "Withdrawn Successfully!!" << endl;
+            cout<<"Incorrect PIN!!"<<endl;
+            return;
         }
-        else
+        if(amount <= 0)
         {
-            cout << "Invalid amount for withdaw." << endl;
+            cout<<"Invalid amount!!"<<endl;
+            return;
         }
+        if(weeklyWithdrawn + amount > weeklyLimit)
+        {
+            cout<<"Weekly withdraw limit exceeded!!"<<endl;
+            return;
+        }
+        if (balance - amount < minBal)
+        {
+            cout<<"Minimum balance (500) must be maintained!!"<<endl;
+            return;
+        }
+        balance -= amount;
+        weeklyWithdrawn += amount;
+        cout<<"Withdraw successful!"<<endl;
     }
-    int getBalance()
+    void showBalance()
     {
-        return balance;
+        cout<<"Current Balance = "<<balance<<endl;
+    }
+    void showWeeklyWithdraw()
+    {
+        cout<<"Withdrawn this week = "<<weeklyWithdrawn<<endl;
     }
 };
 int main()
 {
-    int mainBal;
-    cout << "Give your Amount: ";
-    cin >> mainBal;
-    Account acc(mainBal);
+    int initialBalance, pin;
+    cout<<"Enter initial balance = ";
+    cin >> initialBalance;
+    cout<<"Set your 4-digit PIN = ";
+    cin >> pin;
+    Account acc(initialBalance, pin);
     int choice;
-    while (true)
+    while(true)
     {
-        cout << "\n**** MENU ****\n";
-        cout << "1. Deposit" << endl;
-        cout << "2. Withdaraw" << endl;
-        cout << "3. Check Balance" << endl;
-        cout << "4. Exit" << endl;
-        cout << "Enter Your Choice--> ";
-        cin >> choice;
-        if (choice == 1)
+        cout<<"\n**** MENU ****\n";
+        cout<<"1. Deposit\n";
+        cout<<"2. Withdraw\n";
+        cout<<"3. Check Balance\n";
+        cout<<"4. Weekly Withdraw Info\n";
+        cout<<"5. Exit\n";
+        cout<<"Enter choice: ";
+        cin>>choice;
+        if(choice == 1)
         {
-            int amount;
-            cout << "Enter deposit amount = ";
-            cin >> amount;
-            acc.deposit(amount);
+            int amn;
+            cout<<"Enter deposit amount = ";
+            cin>>amn;
+            acc.deposit(amn);
         }
-        else if (choice == 2)
+        else if(choice == 2)
         {
-            int amount;
-            cout << "Enter Withdaraw amount = ";
-            cin >> amount;
-            acc.withdraw(amount);
+            int amn, enteredPin;
+            cout<<"Enter withdraw amount = ";
+            cin>>amn;
+            cout<<"Enter PIN = ";
+            cin>>enteredPin;
+            acc.withdraw(amn, enteredPin);
         }
-        else if (choice == 3)
+        else if(choice == 3)
         {
-            cout << "Your current Balance = " << acc.getBalance() << endl;
+            acc.showBalance();
         }
-        else if (choice == 4)
+        else if(choice == 4)
         {
-            cout << "Thank you, Sir/Madam..";
+            acc.showWeeklyWithdraw();
+        }
+        else if(choice == 5)
+        {
+            cout<<"Thank you! Program ended."<<endl;
             break;
         }
         else
         {
-            cout << "Invalid choice!! Try again...";
+            cout<<"Invalid choice!"<<endl;
         }
     }
     return 0;
