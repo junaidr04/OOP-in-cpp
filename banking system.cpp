@@ -51,7 +51,7 @@ public:
             cout<<"Invalid amount!!"<<endl;
             return;
         }
-        if(weeklyWithdrawn + amount > weeklyLimit)
+        if(amount > weeklyLimit)
         {
             cout<<"Weekly withdraw limit exceeded!!"<<endl;
             return;
@@ -129,3 +129,4 @@ int main()
     }
     return 0;
 }
+
