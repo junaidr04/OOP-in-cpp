@@ -6,29 +6,15 @@ protected:
     int id;
     string brand;
     double rentPerHr;
-    bool avail;
 public:
-    Vehicle(int id, string brand, double rent)
-        : id(id), brand(brand), rentPerHr(rent), avail(true) {}
+    Vehicle(int id, string brand, double rent): id(id), brand(brand), rentPerHr(rent) {}
     int getId() const
     {
         return id;
     }
-    bool isAvailable() const
+    double getRate() const
     {
-        return avail;
-    }
-    double calRent(int hours) const
-    {
-        return rentPerHr * hours;
-    }
-    void rentVehicle()
-    {
-        avail = false;
-    }
-    void returnVehicle()
-    {
-        avail = true;
+        return rentPerHr;
     }
     virtual ~Vehicle() {}
 };
@@ -76,28 +62,38 @@ public:
     }
 };
 
-//PARKING LOT
+//PARKING SLOT
 class ParkingSlot
 {
     int slotNumber;
     bool occupied;
     Vehicle* vehicle;
+    int entryHour;
 public:
-    ParkingSlot(int num) : slotNumber(num), occupied(false), vehicle(nullptr) {}
+    ParkingSlot(int num) : slotNumber(num), occupied(false), vehicle(nullptr), entryHour(0) {}
     bool isFree() const
     {
         return !occupied;
     }
-    void park(Vehicle* v)
+    void park(Vehicle* v, int hour)
     {
         vehicle = v;
         occupied = true;
-        v->rentVehicle();
+        entryHour = hour;
     }
-    void removeVehicle()
+    void removeVehicle(int exitHour)
     {
-        if(vehicle)
-            vehicle->returnVehicle();
+        int totalHours = exitHour - entryHour;
+        if (totalHours <= 0)
+            totalHours = 1;
+        double bill = totalHours * vehicle->getRate();
+        cout << "\n===== BILL DETAILS =====\n";
+        cout << "Vehicle ID      : " << vehicle->getId() << endl;
+        cout << "Parking Time    : " << totalHours << " hour(s)\n";
+        cout << "Rate per Hour   : " << vehicle->getRate() << " tk\n";
+        cout << "---------------------------\n";
+        cout << "TOTAL AMOUNT    : " << bill << " tk\n";
+        cout << "===========================\n\n";
         vehicle = nullptr;
         occupied = false;
     }
@@ -136,53 +132,51 @@ public:
             return &busSlots;
         else if (type == "truck")
             return &truckSlots;
-        else
-            return nullptr;
+        return nullptr;
     }
-    void parkVehicle(Vehicle* v, const string& type)
+    void parkVehicle(Vehicle* v, const string& type, int entryHour)
     {
         auto slots = getSlots(type);
         if(!slots)
         {
-            cout<<"Invalid type."<<endl;
+            cout<<"Invalid type.\n";
             return;
         }
         for(auto &s : *slots)
         {
             if (s.isFree())
             {
-                s.park(v);
-                cout<<type <<" parked in slot "<<s.getSlotNumber()<<"."<<endl;
+                s.park(v, entryHour);
+                cout<<type <<" parked in slot "<<s.getSlotNumber()<<".\n";
                 return;
             }
         }
-        cout<<"No free slot available for "<<type<<"."<<endl;
+        cout<<"No free slot available for "<<type<<".\n";
     }
-    void removeVehicle(Vehicle* v, const string& type)
+    void removeVehicle(Vehicle* v, const string& type, int exitHour)
     {
         auto slots = getSlots(type);
         if(!slots)
         {
-            cout<<"Invalid type."<<endl;
+            cout<<"Invalid type.\n";
             return;
         }
         for (auto &s : *slots)
         {
             if(s.getVehicle() == v)
             {
-                s.removeVehicle();
-                cout<<type<<" removed from parking."<<endl;
+                s.removeVehicle(exitHour);
                 return;
             }
         }
-        cout<<"Vehicle not found in parking."<<endl;
+        cout<<"Vehicle not found in parking.\n";
     }
     void showSlotInfo(const string& type)
     {
         auto slots = getSlots(type);
         if(!slots)
         {
-            cout<<"Invalid type."<<endl;
+            cout<<"Invalid type.\n";
             return;
         }
         int total = slots->size(), freeCount = 0;
@@ -213,38 +207,35 @@ int main()
         cin >> choice;
         if (choice == 1)
         {
-            int vid, hours;
+            int vid, hour;
             string type;
             cout << "Enter Vehicle ID: ";
             cin >> vid;
-            cout << "Enter Vehicle Type (car/bike/bus/truck): ";
+            cout << "Enter Vehicle Type: ";
             cin >> type;
-            cout << "Enter hours to rent: ";
-            cin >> hours;
+            cout << "Enter Entry Hour (0-23): ";
+            cin >> hour;
             Vehicle* v = vm.findById(vid);
             if (!v)
-                cout<<"Vehicle ID not found!"<<endl;
-            else if (!v->isAvailable())
-                cout<<"Vehicle already rented!"<<endl;
+                cout<<"Vehicle ID not found!\n";
             else
-            {
-                lot.parkVehicle(v, type);
-                cout << "You need to pay: $" << v->calRent(hours) << "\n";
-            }
+                lot.parkVehicle(v, type, hour);
         }
         else if (choice == 2)
         {
-            int vid;
+            int vid, hour;
             string type;
-            cout << "Enter Vehicle ID to remove: ";
+            cout << "Enter Vehicle ID: ";
             cin >> vid;
             cout << "Enter Vehicle Type: ";
             cin >> type;
+            cout << "Enter Exit Hour (0-23): ";
+            cin >> hour;
             Vehicle* v = vm.findById(vid);
             if (!v)
-                cout<<"Vehicle ID not found!"<<endl;
+                cout<<"Vehicle ID not found!\n";
             else
-                lot.removeVehicle(v, type);
+                lot.removeVehicle(v, type, hour);
         }
         else if (choice == 3)
         {
@@ -253,11 +244,8 @@ int main()
             cin >> type;
             lot.showSlotInfo(type);
         }
-        else if(choice == 4)
-        {
-            cout<<"Thank you! Program ended."<<endl;
+        else
             break;
-        }
     }
     return 0;
 }
