@@ -13,13 +13,13 @@ This repository is designed to help learners understand and practice OOP princip
 
 ## 🗂 Repository Contents
 
-| File / Project                | Description |
-|-------------------------------|-------------|
-| `Vehicle Rental System.cpp`   | A parking & vehicle rental system using OOP |
-| `banking system.cpp`          | A simple OOP‑based banking system |
-| `class&object.cpp`            | Basics of classes and objects in C++ |
-| `Parking Lot System.cpp`      | Classes for Vehicle, Spot, Payment; supports multiple types |
-
+| File / Project                  | Description |
+|---------------------------------|-------------|
+| `Vehicle Rental System.cpp`     | A parking & vehicle rental system using OOP |
+| `banking system.cpp`            | A simple OOP‑based banking system |
+| `class&object.cpp`              | Basics of classes and objects in C++ |
+| `Parking Lot System.cpp`        | Classes for Vehicle, Spot, Payment; supports multiple types |
+| `Library Management System.cpp` | OOP: class for Book, User, Issue/Return, Reservation |
 
 ## 📌 Project Highlights
 
